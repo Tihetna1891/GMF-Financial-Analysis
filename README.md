@@ -1,5 +1,5 @@
 # GMF-Financial-Analysis
-## Workflow
+## Task 1 : Preprocess and Explore the Data Workflow
 #step - 1: Fetching the financial data
 To fetch historical financial data for TSLA, BND, and SPY from January 1, 2015, to October 31, 2024, you can use the yfinance library in Python. Here’s how to download the data for that specific date range.
 ```
@@ -126,6 +126,7 @@ decomposition.plot()
 plt.show()
 
 ```
+![Untitled](https://github.com/user-attachments/assets/1e2ac158-610d-4d00-a3c3-004b55c70033)
 #Step 5: Volatility Analysis and Key Insights
 
 1,Calculate Value at Risk (VaR) and Sharpe Ratio
@@ -151,4 +152,118 @@ Fluctuations in Daily Returns: Volatility bands and outliers show periods of hig
 
 Risk-Adjusted Return: The Sharpe Ratio assesses the risk-adjusted return of each asset, with higher values indicating more efficient returns per unit of risk.
 
+#Task 2: Develop Time Series Forecasting Models
+
+This task involves building a time series forecasting model to predict all assets's future stock prices. Below are the step-by-step implementation to develop, evaluate, and refine a forecasting model using common techniques such as ARIMA, SARIMA, or LSTM.
+
+#Step 1: Forecast Future Prices for All Assets (TSLA, BND, SPY)
+
+Use your chosen model (e.g., ARIMA, SARIMA, or LSTM) for each asset individually. Here’s a rough example for three assets:
+```
+# Forecasting prices for TSLA, BND, SPY (repeat similar code for each asset)
+
+# Example code for TSLA
+tsla_forecast = forecast_lstm(tsla_data)  # Use your LSTM or ARIMA model here
+
+# Example code for BND and SPY
+bnd_forecast = forecast_sarima(bnd_data)  # Use SARIMA model here
+spy_forecast = forecast_arima(spy_data)   # Use ARIMA model here
+
+# Combine into a DataFrame
+forecast_data = pd.DataFrame({
+    'TSLA': tsla_forecast,
+    'BND': bnd_forecast,
+    'SPY': spy_forecast
+})
+
+```
+#Step 2: Compile Forecasted Data into a Portfolio DataFrame
+```
+# Combine historical data and forecast data
+historical_data = pd.DataFrame({
+    'TSLA': tsla_data,
+    'BND': bnd_data,
+    'SPY': spy_data
+})
+combined_df = pd.concat([historical_data, forecast_data], axis=0)
+
+# Visualize the combined data to check trends
+combined_df.plot(figsize=(14, 7))
+plt.title("Historical and Forecasted Prices for TSLA, BND, SPY")
+plt.show()
+
+```
+#Step 3: Calculate Expected Returns and Volatility for Each Asset
+
+Use the forecasted prices to calculate daily returns and then annualize them.
+```
+# Calculate daily returns from forecast data
+forecasted_daily_returns = forecast_data.pct_change()
+
+# Annualized returns
+annualized_forecasted_return = forecasted_daily_returns.mean() * 252
+cov_matrix_forecasted = forecasted_daily_returns.cov() * 252
+
+print("Annualized Forecasted Return:", annualized_forecasted_return)
+print("Forecasted Covariance Matrix:", cov_matrix_forecasted)
+
+```
+Step 4: Define Initial Weights and Optimize Portfolio Weights
+Use optimization to find the weight distribution that maximizes the Sharpe ratio based on the forecasted data.
+```
+from scipy.optimize import minimize
+
+# Set initial weights (e.g., equal weighting or any other initial guess)
+initial_weights = [1/3, 1/3, 1/3]
+
+# Define negative Sharpe Ratio function for optimization
+def neg_sharpe(weights):
+    portfolio_return = np.dot(weights, annualized_forecasted_return)
+    portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix_forecasted, weights)))
+    return -portfolio_return / portfolio_volatility
+
+# Constraints and bounds
+constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}  # Weights sum to 1
+bounds = tuple((0, 1) for _ in range(len(initial_weights)))
+
+# Run optimization
+optimized_results = minimize(neg_sharpe, initial_weights, method='SLSQP', bounds=bounds, constraints=constraints)
+optimized_weights = optimized_results.x
+
+print("Optimized Weights:", optimized_weights)
+
+```
+#Step 5: Calculate Portfolio Performance Metrics and Visualize Results
+
+After optimizing the weights, calculate and visualize the expected portfolio returns, volatility, and Sharpe ratio.
+```
+# Calculate optimized portfolio performance
+optimized_portfolio_return = np.dot(optimized_weights, annualized_forecasted_return)
+optimized_portfolio_volatility = np.sqrt(np.dot(optimized_weights.T, np.dot(cov_matrix_forecasted, optimized_weights)))
+optimized_sharpe_ratio = optimized_portfolio_return / optimized_portfolio_volatility
+
+print("Optimized Portfolio Return:", optimized_portfolio_return)
+print("Optimized Portfolio Volatility:", optimized_portfolio_volatility)
+print("Optimized Sharpe Ratio:", optimized_sharpe_ratio)
+
+# Plot cumulative returns
+cumulative_returns = (1 + forecasted_daily_returns).cumprod()
+optimized_cumulative_returns = (1 + forecasted_daily_returns.dot(optimized_weights)).cumprod()
+
+plt.figure(figsize=(14, 7))
+for asset in ['TSLA', 'BND', 'SPY']:
+    plt.plot(cumulative_returns[asset], label=f"{asset} Cumulative Return")
+plt.plot(optimized_cumulative_returns, label="Optimized Portfolio", linestyle='--')
+plt.xlabel("Date")
+plt.ylabel("Cumulative Return")
+plt.title("Cumulative Return for Each Asset and Optimized Portfolio")
+plt.legend()
+plt.show()
+
+```
+#Step 6: Interpret Results and Make Portfolio Adjustments
+Based on the optimized weights and forecast analysis:
+
+Expected Return and Volatility: Higher return and Sharpe ratio indicate potential for growth with minimized risk.
+Weight Adjustments: Increase weights in stable assets like BND if Tesla (TSLA) shows high forecasted volatility.
 
