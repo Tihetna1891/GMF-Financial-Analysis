@@ -94,6 +94,7 @@ plt.legend()
 plt.show()
 
  ```
+![Untitled](https://github.com/user-attachments/assets/4412a4b5-72f5-4be3-88ba-56c688b38d81)
 4, Outlier Detection (Days with High/Low Returns)
 
 ```
@@ -140,7 +141,8 @@ print("95% VaR for each asset:\n", var_95)
 sharpe_ratio = (daily_returns.mean() * 252) / (daily_returns.std() * (252**0.5))
 print("Sharpe Ratio for each asset:\n", sharpe_ratio)
 ```
-#Key Insights
+#Key Insights:
+
 Overall Direction of Tesla’s Stock Price: The trend component from the decomposition will indicate the direction of TSLA’s stock over the years.
 
 Fluctuations in Daily Returns: Volatility bands and outliers show periods of high volatility, which can indicate key events affecting Tesla, bond stability (BND), and broader market trends (SPY).
