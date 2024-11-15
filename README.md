@@ -111,7 +111,9 @@ plt.ylabel("Return (%)")
 plt.legend()
 plt.show()
 
-``` 
+```
+![Untitled](https://github.com/user-attachments/assets/f4177b18-5903-4e91-8e0f-37f844a6607d)
+
 
 #Step 4: Seasonality and Trends
 Decompose the time series into trend, seasonality, and residual components.
