@@ -67,7 +67,83 @@ plt.show()
 ![Untitled](https://github.com/user-attachments/assets/383cab1d-c78b-4eaf-97e2-671d19203cf1)
 
 2, Calculate and Plot Daily Percentage Change
+```
+daily_returns = data.pct_change().dropna()  # Daily percentage change
+daily_returns.plot(figsize=(14, 7), title="Daily Percentage Change", xlabel="Date", ylabel="Daily Return (%)")
+plt.show()
 
-Step 4: 
+```
+3, Analyze Volatility
+
+    -Rolling Means and Standard Deviations
+```
+    # Calculate 30-day rolling means and standard deviations
+rolling_mean = data.rolling(window=30).mean()
+rolling_std = data.rolling(window=30).std()
+
+plt.figure(figsize=(14, 7))
+for col in data.columns:
+    plt.plot(rolling_mean.index, rolling_mean[col], label=f'{col} 30-Day Mean')
+    plt.fill_between(rolling_std.index, (rolling_mean[col] - rolling_std[col]), 
+                     (rolling_mean[col] + rolling_std[col]), alpha=0.1)
+plt.title("30-Day Rolling Means and Volatility Bands")
+plt.xlabel("Date")
+plt.ylabel("Price")
+plt.legend()
+plt.show()
+
+ ```
+4, Outlier Detection (Days with High/Low Returns)
+
+```
+# Identify outliers based on daily returns
+outliers = daily_returns[(daily_returns > daily_returns.mean() + 3*daily_returns.std()) |
+                         (daily_returns < daily_returns.mean() - 3*daily_returns.std())]
+
+plt.figure(figsize=(14, 7))
+for col in outliers.columns:
+    plt.scatter(outliers.index, outliers[col], label=f'{col} Outliers', alpha=0.5)
+plt.title("Days with Unusually High/Low Returns")
+plt.xlabel("Date")
+plt.ylabel("Return (%)")
+plt.legend()
+plt.show()
+
+``` 
+
+#Step 4: Seasonality and Trends
+Decompose the time series into trend, seasonality, and residual components.
+```
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+# Decompose TSLA's closing prices as an example
+decomposition = seasonal_decompose(data['TSLA'], model='multiplicative', period=252)
+decomposition.plot()
+plt.show()
+
+```
+#Step 5: Volatility Analysis and Key Insights
+
+1,Calculate Value at Risk (VaR) and Sharpe Ratio
+
+    -VaR Calculation
+```
+# 5% VaR assuming normal distribution
+var_95 = daily_returns.quantile(0.05)
+print("95% VaR for each asset:\n", var_95)
+
+```
+    -Sharpe Ratio
+```
+# Assume a risk-free rate of 0 for simplicity
+sharpe_ratio = (daily_returns.mean() * 252) / (daily_returns.std() * (252**0.5))
+print("Sharpe Ratio for each asset:\n", sharpe_ratio)
+```
+#Key Insights
+Overall Direction of Tesla’s Stock Price: The trend component from the decomposition will indicate the direction of TSLA’s stock over the years.
+
+Fluctuations in Daily Returns: Volatility bands and outliers show periods of high volatility, which can indicate key events affecting Tesla, bond stability (BND), and broader market trends (SPY).
+
+Risk-Adjusted Return: The Sharpe Ratio assesses the risk-adjusted return of each asset, with higher values indicating more efficient returns per unit of risk.
 
 
