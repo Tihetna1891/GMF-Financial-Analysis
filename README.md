@@ -73,6 +73,7 @@ daily_returns.plot(figsize=(14, 7), title="Daily Percentage Change", xlabel="Dat
 plt.show()
 
 ```
+![Untitled](https://github.com/user-attachments/assets/62d4ce1b-cabb-4466-b9e0-b61677c0bc00)
 3, Analyze Volatility
 
     -Rolling Means and Standard Deviations
