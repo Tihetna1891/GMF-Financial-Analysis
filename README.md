@@ -64,6 +64,8 @@ plt.legend()
 plt.show()
 
 ```
+![Untitled](https://github.com/user-attachments/assets/383cab1d-c78b-4eaf-97e2-671d19203cf1)
+
 2, Calculate and Plot Daily Percentage Change
 
 Step 4: 
